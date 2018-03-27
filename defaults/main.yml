@@ -1,0 +1,70 @@
+---
+# The EC2 management tag is the initial tag that is supplied to the instance creation. Security groups can be applied to
+# this tag, limiting the build account to modify only resources with this tag.
+# ec2_management_tags:
+#  managed-by: "ansible-project-code"
+
+# The expected state of the instance. Valid states are:
+# - running
+# - absent
+# - stopped
+ec2_instance_state: "running"
+
+# The SSH key, stored in Amazon, that will be assigned to this instance.
+# (Required)
+# ec2_key_name: __YOUR_KEY_NAME_HERE__
+
+# The VPC in which to provision this EC2
+# (required)
+# ec2_vpc_subnet_id: __YOUR_SUBNET_ID_HERE__
+
+# The security groups that this instance will be a part of.
+ec2_security_groups: [""]
+
+# The instance type that should be provisioned. Check the following URL for a list of instance types
+ec2_instance_type: "t2.micro"
+
+# The AMI ID for the the source image of instance.
+# (Default: Ubuntu 16.04, retrieved June 21, 2017)
+ec2_ami_id: "ami-1c45e273"
+
+# A set of key -> value pairs that will be applied to an instance, as well as it's root disk
+# (Default: An empty name.)
+ec2_tags:
+  Name: ""
+
+# Whether to enable detailed cloudwatch monitoring on this module
+ec2_monitoring: "no"
+
+# Whether to make this instance publically addressable (i.e. from the internet)
+ec2_assign_public_ip: "no"
+
+# In which location to provision this EC2 instance
+ec2_region: "eu-central-1"
+
+# The UUID assigned to this machine, so that the operations that apply to it are idempotent (i.e. machines are not
+# infinitely spin up
+# (Required)
+# ec2_id: __YOUR_UUID_HERE__
+
+# How the instance should be treated on shutdown.
+# Can be one of:
+# - stop
+# - terminate
+ec2_instance_initiated_shutdown_behavior: "stop"
+
+## The EC2 volumes, including the root disk volume. Defaults to a single 8gb volume. Note: There is a bug in which
+## ubuntu AMIs require the volume to be at /dev/sda1; given this is the most common archicture, this is the default.
+## However, it may need to be customized on a per instance basis.
+##
+## See https://github.com/ansible/ansible/issues/20347
+ec2_volumes:
+    ## The device name / mount path
+  - device_name: "/dev/sda1"
+    ## The device type. A full list of types is available at the following URL:
+    ## http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html
+    device_type: "gp2"
+    ## The size of the volume. The default is 8gb; small enough for a single purpose web node.
+    volume_size: 8
+    ## Whether to remove this volume when the instance dies.
+    delete_on_termination: true
