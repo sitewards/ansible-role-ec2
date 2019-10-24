@@ -27,6 +27,8 @@
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
     id: "{{ ec2_id }}"
     volumes: "{{ ec2_volumes }}"
+    instance_initiated_shutdown_behavior: "{{ ec2_instance_initiated_shutdown_behavior }}"
+    instance_profile_name: "{{ ec2_iam_role }}"
   register: "ec2_provisioner"
 
 - name: "Set the EC2 reference from the idempotently created machine, for state modification"

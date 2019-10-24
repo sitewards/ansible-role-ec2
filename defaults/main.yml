@@ -68,3 +68,7 @@ ec2_volumes:
     volume_size: 8
     ## Whether to remove this volume when the instance dies.
     delete_on_termination: true
+
+## The EC2 aim role that is supposed to be assigned to the instance.
+## Pipeline user needs to be able to assign this role (see INFRA-48 for details)
+ec2_iam_role: "Ec2ShowroomInstance"
