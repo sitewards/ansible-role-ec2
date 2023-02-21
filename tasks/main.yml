@@ -12,23 +12,26 @@
 #      implementation is buggy; we may stop or delete the wrong machine.
 #   3. Modify state based on the fetched ID.
 #
+- name: Print the ec2_ami_id
+  ansible.builtin.debug:
+    msg: ec2_ami_id =  {{ ec2_ami_id }}
+
 - name: "Ensure the webserver is provisioned"
-  ec2:
+  amazon.aws.ec2_instance:
     key_name: "{{ ec2_key_name }}"
     instance_type: "{{ ec2_instance_type }}"
-    image: "{{ ec2_ami_id }}"
-    group: "{{ ec2_security_groups }}"
-    wait: "yes"
+    image_id: "{{ ec2_ami_id }}"
+    security_groups: "{{ ec2_security_groups }}"
     wait_timeout: "300"
     count: 1
-    instance_tags: "{{ ec2_management_tags }}"
-    monitoring: "{{ ec2_monitoring }}"
+    tags: "{{ ec2_management_tags }}"
+    detailed_monitoring: "{{ ec2_monitoring }}"
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    id: "{{ ec2_id }}"
+    instance_ids: "{{ ec2_id }}"
     volumes: "{{ ec2_volumes }}"
     instance_initiated_shutdown_behavior: "{{ ec2_instance_initiated_shutdown_behavior }}"
-    instance_profile_name: "{{ ec2_iam_role }}"
+    instance_role: "{{ ec2_iam_role }}"
   register: "ec2_provisioner"
 
 - name: "Set the EC2 reference from the idempotently created machine, for state modification"
@@ -40,15 +43,15 @@
     var: "ec2_instance_id"
 
 - name: "Enforce the instance state, groups"
-  ec2:
+  amazon.aws.ec2_instance:
     region: "{{ ec2_region }}"
     instance_ids:
       - "{{ ec2_instance_id }}"
     state: "{{ ec2_instance_state }}"
-    group: "{{ ec2_security_groups }}"
+    security_groups: "{{ ec2_security_groups }}"
 
 - name: "Enforce instance tags"
-  ec2_tag:
+  amazon.aws.ec2_tag:
     resource: "{{ ec2_instance_id }}"
     region: "{{ ec2_region }}"
     state: "present"
@@ -56,7 +59,7 @@
   when: ec2_instance_state != "absent"
 
 - name: "Retrieve all volumes for the created instance"
-  ec2_vol:
+  amazon.aws.ec2_vol_info:
     instance: "{{ ec2_instance_id }}"
     region: "{{ ec2_region }}"
     state: "list"
@@ -67,7 +70,7 @@
     var: "ec2_vol"
 
 - name: "Ensure all volumes are tagged"
-  ec2_tag:
+  amazon.aws.ec2_tag:
     region:  "{{ ec2_region }}"
     resource: '{{ item.id }}'
     state: "present"
